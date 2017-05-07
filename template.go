@@ -18,10 +18,11 @@ func (template *Template) topNode() INode {
 	return template.stack[len(template.stack)-1]
 }
 
-func (template *Template) popNode() {
+func (template *Template) popNode() INode {
+	node := template.topNode()
 	template.topNode().close()
 	template.stack = template.stack[:len(template.stack)-1]
-
+	return node
 }
 func (template *Template) cleanStack() {
 	for template.topNode().isClosed() {
@@ -42,8 +43,11 @@ func (template *Template) addNode(node INode) {
 	if template.topNode().toString() == "<IF>" && node.toString() == "<ELSE>" {
 		template.popNode()
 	}
-	if node.toString() == "</IF>" {
-		template.popNode()
+	if node.toString() == "</IFELSE>" {
+		closedNode := template.popNode()
+		for closedNode.toString() != "<IFELSE>" {
+			closedNode = template.popNode()
+		}
 	}
 	template.debugPrint(node)
 

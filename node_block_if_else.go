@@ -85,7 +85,7 @@ type EndIfNode struct {
 func (node EndIfNode) append(child *INode) {}
 
 func (node EndIfNode) toString() string {
-	return fmt.Sprintf("</IF>")
+	return fmt.Sprintf("</IFELSE>")
 }
 func (node *EndIfNode) close() {
 	node.closed = true
