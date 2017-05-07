@@ -14,5 +14,11 @@ func TestCalcDesiredNumDynos(t *testing.T) {
 	t2 := "initial text, {% if foo == bar %}FOO{% endif %} final text."
 	template2 := Template{NewDefaultConfig(), "", RootNode{}, []INode{}}
 	template2.Compile(t2)
+	println("")
+
+	t3 := "initial text, {{ your_name }} final text."
+	template3 := Template{NewDefaultConfig(), "", RootNode{}, []INode{}}
+	template3.Compile(t3)
+	println("")
 
 }

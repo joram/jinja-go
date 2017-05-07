@@ -121,6 +121,14 @@ func (template *Template) GetNode(body string) ([]INode, int64, error) {
 		}
 		return nodes, end, nil
 	}
+
+	if s == template.Config.VariableEndString {
+		varNode := VariableNode{
+			body: body[:end],
+		}
+		return []INode{&varNode}, end, nil
+	}
+
 	return []INode{}, end, nil
 }
 
