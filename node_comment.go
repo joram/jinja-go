@@ -2,21 +2,21 @@ package jinja_go
 
 import "fmt"
 
-type VariableNode struct {
+type CommentNode struct {
 	children []*INode
 	body     string
 }
 
-func (node *VariableNode) append(child *INode) {
+func (node *CommentNode) append(child *INode) {
 	node.children = append(node.children, child)
 }
 
-func (node *VariableNode) close() {}
+func (node *CommentNode) close() {}
 
-func (node *VariableNode) isClosed() bool {
+func (node *CommentNode) isClosed() bool {
 	return true
 }
 
-func (node *VariableNode) toString() string {
-	return fmt.Sprintf("<VAR>")
+func (node *CommentNode) toString() string {
+	return fmt.Sprintf("<COMMENT>")
 }

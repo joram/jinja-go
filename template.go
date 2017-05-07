@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"time"
 )
 
 type Template struct {
@@ -72,7 +71,6 @@ func (template *Template) Compile(content string) error {
 			return err
 		}
 		content = content[length:]
-		time.Sleep(time.Second)
 	}
 	if err != io.EOF {
 		return err
@@ -127,6 +125,13 @@ func (template *Template) GetNode(body string) ([]INode, int64, error) {
 			body: body[:end],
 		}
 		return []INode{&varNode}, end, nil
+	}
+
+	if s == template.Config.CommentEndString {
+		commentNode := CommentNode{
+			body: body[:end],
+		}
+		return []INode{&commentNode}, end, nil
 	}
 
 	return []INode{}, end, nil

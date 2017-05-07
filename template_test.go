@@ -21,4 +21,9 @@ func TestCalcDesiredNumDynos(t *testing.T) {
 	template3.Compile(t3)
 	println("")
 
+	t4 := "initial text, {# you smell bad #} final text."
+	template4 := Template{NewDefaultConfig(), "", RootNode{}, []INode{}}
+	template4.Compile(t4)
+	println("")
+
 }
