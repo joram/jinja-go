@@ -22,6 +22,9 @@ func visit(path string, f os.FileInfo, err error) error {
 	content := string(bytes)
 	template := NewTemplate()
 	template.Compile(content)
+
+	treeString, _ := template.JSONTree()
+	println(treeString)
 	return nil
 }
 

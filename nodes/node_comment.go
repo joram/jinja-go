@@ -8,7 +8,7 @@ type CommentNode struct {
 }
 
 func NewCommentNode(body string) INode {
-	return &CommentNode{body: body}
+	return &CommentNode{NewHasNoChildren("COMMENT"), body}
 }
 
 func (node *CommentNode) ToString() string {

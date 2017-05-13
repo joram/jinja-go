@@ -6,6 +6,10 @@ type EndIfNode struct {
 	HasNoChildren
 }
 
+func NewEndIfNode() INode {
+	return &EndIfNode{NewHasNoChildren("ENDIF")}
+}
+
 func (node EndIfNode) ToString() string {
 	return fmt.Sprintf("</IFELSE>")
 }

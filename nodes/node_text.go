@@ -8,7 +8,7 @@ type TextNode struct {
 }
 
 func NewTextNode(content string) INode {
-	node := TextNode{text: content}
+	node := TextNode{NewHasNoChildren("TEXT"), content}
 	return &node
 }
 func (node TextNode) ToString() string {

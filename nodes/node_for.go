@@ -6,6 +6,10 @@ type ForNode struct {
 	HasChildren
 }
 
+func NewForNode() INode {
+	return &ForNode{NewHasChildren("FOR")}
+}
+
 func (node *ForNode) ToString() string {
 	return fmt.Sprintf("<FOR>")
 }

@@ -1,9 +1,14 @@
 package nodes
 
 type IfElseNode struct {
+	HasChildren
 	IfNode   INode
 	ElseNode INode
 	EndNode  INode
+}
+
+func NewIfElseNode() IfElseNode {
+	return IfElseNode{NewHasChildren("IFELSE"), nil, nil, nil}
 }
 
 func (node *IfElseNode) ToString() string {

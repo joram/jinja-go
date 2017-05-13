@@ -6,6 +6,10 @@ type ElseNode struct {
 	HasChildren
 }
 
+func NewElseNode() INode {
+	return &ElseNode{NewHasChildren("ELSE")}
+}
+
 func (node ElseNode) ToString() string {
 	return fmt.Sprintf("<ELSE>")
 }

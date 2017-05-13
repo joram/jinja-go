@@ -6,6 +6,10 @@ type EndForNode struct {
 	HasNoChildren
 }
 
+func NewEndForNode() INode {
+	return &EndForNode{NewHasNoChildren("ENDFOR")}
+}
+
 func (node EndForNode) ToString() string {
 	return fmt.Sprintf("</FOR>")
 }

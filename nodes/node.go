@@ -21,23 +21,34 @@ type INode interface {
 }
 
 type HasChildren struct {
-	children []*INode
+	Type     string
+	Children []*INode
 }
 
-func (node HasChildren) Append(child *INode) {
-	node.children = append(node.children, child)
+func NewHasChildren(t string) HasChildren {
+	return HasChildren{t, []*INode{}}
+}
+
+func (node *HasChildren) Append(child *INode) {
+	node.Children = append(node.Children, child)
 }
 
 func (node HasChildren) GetChildren() []*INode {
-	return node.children
+	return node.Children
 }
 
-type HasNoChildren struct{}
+type HasNoChildren struct {
+	Type string
+}
+
+func NewHasNoChildren(t string) HasNoChildren {
+	return HasNoChildren{t}
+}
 
 func (node HasNoChildren) GetChildren() []*INode {
 	return nil
 }
 
 func (node HasNoChildren) Append(child *INode) {
-	panic("adding child to node with no children")
+	panic("adding child to node with no Children")
 }

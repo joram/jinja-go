@@ -1,7 +1,7 @@
 package jinja_go
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/joram/jinja-go/nodes"
 	"sync"
 )
@@ -14,7 +14,12 @@ type Template struct {
 }
 
 func NewTemplate() Template {
-	return Template{NewDefaultConfig(), "", nodes.RootNode{}, []nodes.INode{}}
+	return Template{
+		NewDefaultConfig(),
+		"",
+		nodes.NewRootNode(),
+		[]nodes.INode{},
+	}
 }
 
 func (template *Template) topNode() nodes.INode {
@@ -46,7 +51,7 @@ func (template *Template) Compile(content string) error {
 	go GetNodes(content, c, &wg, template.Config)
 	for node := range c {
 		if node.Type() == nodes.NODE_TYPE_IF {
-			ifElseNode := nodes.IfElseNode{}
+			ifElseNode := nodes.NewIfElseNode()
 			ifElseNode.IfNode = node
 			template.addNode(&ifElseNode)
 			template.addNode(node)
@@ -91,25 +96,24 @@ func (template *Template) Compile(content string) error {
 		}
 
 		if node.Type() == nodes.NODE_TYPE_TEXT {
+			template.addNode(node)
+			template.popNode()
 			continue
 		}
 		if node.Type() == nodes.NODE_TYPE_COMMENT {
+			template.addNode(node)
+			template.popNode()
 			continue
 		}
 	}
 	wg.Wait()
-	//traverseTree(&template.rootNode, 0)
 	return nil
 }
 
-func traverseTree(node nodes.INode, level int) {
-
-	tabs := fmt.Sprintf("%d: ", level)
-	for i := 0; i < level; i++ {
-		tabs += "  "
+func (template Template) JSONTree() (string, error) {
+	b, err := json.Marshal(template.rootNode)
+	if err != nil {
+		return "", err
 	}
-	fmt.Printf("%s%s\n", tabs, node.ToString())
-	for _, child := range node.GetChildren() {
-		traverseTree(*child, level+1)
-	}
+	return string(b), nil
 }

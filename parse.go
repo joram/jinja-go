@@ -46,19 +46,19 @@ func GetNode(body string, config Configuration) (nodes.INode, int64, error) {
 		blockType = strings.TrimLeft(blockType, " ")
 		blockType = blockType[:strings.Index(blockType, " ")]
 		if blockType == "if" {
-			return &nodes.IfNode{}, end, nil
+			return nodes.NewIfNode(), end, nil
 		}
 		if blockType == "else" {
-			return &nodes.ElseNode{}, end, nil
+			return nodes.NewElseNode(), end, nil
 		}
 		if blockType == "endif" {
-			return &nodes.EndIfNode{}, end, nil
+			return nodes.NewEndIfNode(), end, nil
 		}
 		if blockType == "for" {
-			return &nodes.ForNode{}, end, nil
+			return nodes.NewForNode(), end, nil
 		}
 		if blockType == "endfor" {
-			return &nodes.EndForNode{}, end, nil
+			return nodes.NewEndForNode(), end, nil
 		}
 		return nil, end, nil
 	}

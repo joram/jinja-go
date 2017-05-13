@@ -6,6 +6,10 @@ type IfNode struct {
 	HasChildren
 }
 
+func NewIfNode() INode {
+	return &IfNode{NewHasChildren("IF")}
+}
+
 func (node *IfNode) ToString() string {
 	return fmt.Sprintf("<IF>")
 }
