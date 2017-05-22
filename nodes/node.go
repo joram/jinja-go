@@ -18,6 +18,7 @@ type INode interface {
 	ToString() string
 	GetChildren() []*INode
 	Append(child *INode)
+	Render(map[string]interface{}) string
 }
 
 type HasChildren struct {

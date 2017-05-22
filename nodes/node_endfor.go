@@ -17,3 +17,7 @@ func (node EndForNode) ToString() string {
 func (node *EndForNode) Type() int {
 	return NODE_TYPE_ENDFOR
 }
+
+func (node *EndForNode) Render(context map[string]interface{}) string {
+	return ""
+}

@@ -28,3 +28,7 @@ func (node *IfElseNode) GetChildren() []*INode {
 }
 
 func (node *IfElseNode) Append(child *INode) {}
+
+func (node *IfElseNode) Render(context map[string]interface{}) string {
+	return "" // TODO
+}

@@ -105,6 +105,11 @@ func (template *Template) Compile(content string) error {
 			template.popNode()
 			continue
 		}
+		if node.Type() == nodes.NODE_TYPE_VARIABLE {
+			template.addNode(node)
+			template.popNode()
+			continue
+		}
 	}
 	wg.Wait()
 	return nil

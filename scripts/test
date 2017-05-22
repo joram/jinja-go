@@ -2,4 +2,4 @@
 #? Run the app
 
 go build
-go test
+go test ./tests

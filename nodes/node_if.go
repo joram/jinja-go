@@ -17,3 +17,7 @@ func (node *IfNode) ToString() string {
 func (node *IfNode) Type() int {
 	return NODE_TYPE_IF
 }
+
+func (node *IfNode) Render(context map[string]interface{}) string {
+	return "" // TODO
+}

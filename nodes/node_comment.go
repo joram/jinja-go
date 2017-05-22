@@ -18,3 +18,7 @@ func (node *CommentNode) ToString() string {
 func (node *CommentNode) Type() int {
 	return NODE_TYPE_COMMENT
 }
+
+func (node *CommentNode) Render(c map[string]interface{}) string {
+	return ""
+}
