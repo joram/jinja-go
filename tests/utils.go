@@ -11,3 +11,11 @@ func readFileContent(path string) string {
 	return content
 
 }
+
+func readFileContentAsBytes(path string) []byte {
+	bytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	return bytes
+}

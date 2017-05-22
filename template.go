@@ -3,6 +3,7 @@ package jinja_go
 import (
 	"encoding/json"
 	"github.com/joram/jinja-go/nodes"
+	"strings"
 	"sync"
 )
 
@@ -121,4 +122,12 @@ func (template Template) JSONTree() (string, error) {
 		return "", err
 	}
 	return string(b), nil
+}
+
+func (template Template) Render(context map[string]interface{}) string {
+	rendered := template.rootNode.Render(context)
+	if !strings.HasSuffix(rendered, "\n") {
+		rendered += "\n"
+	}
+	return rendered
 }
