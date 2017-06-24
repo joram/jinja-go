@@ -23,39 +23,6 @@ func TestRender(t *testing.T) {
 
 func TemplateRenderTest(path string, f os.FileInfo, err error) error {
 
-	ignoreTemplates := []string{
-	//"templates/sendwithus/templates/airmail/progress.html",
-	//"templates/sendwithus/templates/go/confirm.html",
-	//"templates/sendwithus/templates/go/invite.html",
-	//"templates/sendwithus/templates/go/invoice.html",
-	//"templates/sendwithus/templates/go/ping.html",
-	//"templates/sendwithus/templates/go/progress.html",
-	//"templates/sendwithus/templates/go/reignite.html",
-	//"templates/sendwithus/templates/go/survey.html",
-	//"templates/sendwithus/templates/go/upsell.html",
-	//"templates/sendwithus/templates/go/welcome.html",
-	//"templates/sendwithus/templates/goldstar/birthday.html",
-	//"templates/sendwithus/templates/mantra/progress.html",
-	//"templates/sendwithus/templates/neopolitan/confirm.html",
-	//"templates/sendwithus/templates/neopolitan/invite.html",
-	//"templates/sendwithus/templates/neopolitan/invoice.html",
-	//"templates/sendwithus/templates/neopolitan/ping.html",
-	//"templates/sendwithus/templates/neopolitan/progress.html",
-	//"templates/sendwithus/templates/neopolitan/reignite.html",
-	//"templates/sendwithus/templates/neopolitan/survey.html",
-	//"templates/sendwithus/templates/neopolitan/upsell.html",
-	//"templates/sendwithus/templates/neopolitan/welcome.html",
-	//"templates/sendwithus/templates/sunday/confirm.html",
-	//"templates/sendwithus/templates/sunday/invite.html",
-	}
-
-	for _, ignorePath := range ignoreTemplates {
-		if path == ignorePath {
-			fmt.Printf("skipping rendering of *: %s\n", path)
-			return nil
-		}
-	}
-
 	if !strings.HasSuffix(path, ".html") {
 		return nil
 	}
