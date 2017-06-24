@@ -42,6 +42,10 @@ func (template *Template) addNode(node nodes.INode) {
 }
 
 func (template *Template) Compile(content string) error {
+	content = strings.Replace(content, "\r\n", "\n", -1)
+	content = strings.Replace(content, "\n\r", "\n", -1)
+	content = strings.Replace(content, "\r", "\n", -1)
+
 	template.Content = content
 	template.stack = []nodes.INode{&template.rootNode}
 	ifElses := []nodes.IfElseNode{}

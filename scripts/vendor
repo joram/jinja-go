@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#? Fetch dependencies swu vendor fetch github.com/...
+
+govendor $@

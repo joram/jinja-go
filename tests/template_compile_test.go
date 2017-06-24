@@ -10,28 +10,30 @@ import (
 	"testing"
 )
 
-func TemplateCompileTest(path string, f os.FileInfo, err error) error {
-	fmt.Printf("checking compiled tree of: %s\n", path)
-	if !strings.HasSuffix(path, ".html") {
+func TemplateCompileTest(templatePath string, f os.FileInfo, err error) error {
+	fmt.Printf("checking compiled tree of: %s\n", templatePath)
+	if !strings.HasSuffix(templatePath, ".html") {
 		return nil
 	}
 
-	content := readFileContent(path)
-	template := jinja_go.NewTemplate()
-	expectedTreePath := strings.Replace(path, "templates", "compile_tree", 1)
-	expectedTreePath = strings.Replace(expectedTreePath, ".html", ".json", 1)
+	// arrange
+	expectedTreePath := strings.Replace(templatePath, ".html", ".compile_tree.json", 1)
 	expectedTree := readFileContent(expectedTreePath)
+
+	content := readFileContent(templatePath)
+	template := jinja_go.NewTemplate()
 	template.Compile(content)
-	tree, err := template.JSONTree()
 
 	// act
-	treeString, _ := template.JSONTree()
+	tree, err := template.JSONTree()
 
+	// assert
 	if err != nil {
 		return err
 	}
+
 	if tree != expectedTree {
-		fmt.Printf("expected:\t%s\nactual:\t\t%s\n", expectedTree, treeString)
+		fmt.Printf("expected:\t%s\nactual:\t\t%s\n", expectedTree, tree)
 		return errors.New("Failed to compile properly")
 	}
 	return nil
