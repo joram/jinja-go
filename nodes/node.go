@@ -19,15 +19,17 @@ type INode interface {
 	GetChildren() []*INode
 	Append(child *INode)
 	Render(map[string]interface{}) string
+	GetContent() string
 }
 
 type HasChildren struct {
 	Type     string
 	Children []*INode
+	Content  string
 }
 
-func NewHasChildren(t string) HasChildren {
-	return HasChildren{t, []*INode{}}
+func NewHasChildren(t, content string) HasChildren {
+	return HasChildren{t, []*INode{}, content}
 }
 
 func (node *HasChildren) Append(child *INode) {
@@ -38,12 +40,17 @@ func (node HasChildren) GetChildren() []*INode {
 	return node.Children
 }
 
-type HasNoChildren struct {
-	Type string
+func (node *HasChildren) GetContent() string {
+	return node.Content
 }
 
-func NewHasNoChildren(t string) HasNoChildren {
-	return HasNoChildren{t}
+type HasNoChildren struct {
+	Type    string
+	Content string
+}
+
+func NewHasNoChildren(t, content string) HasNoChildren {
+	return HasNoChildren{t, content}
 }
 
 func (node HasNoChildren) GetChildren() []*INode {
@@ -52,4 +59,8 @@ func (node HasNoChildren) GetChildren() []*INode {
 
 func (node HasNoChildren) Append(child *INode) {
 	panic("adding child to node with no Children")
+}
+
+func (node *HasNoChildren) GetContent() string {
+	return node.Content
 }

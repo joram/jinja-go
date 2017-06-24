@@ -18,7 +18,7 @@ func NewTemplate() Template {
 	return Template{
 		NewDefaultConfig(),
 		"",
-		nodes.NewRootNode(),
+		nodes.NewRootNode(""),
 		[]nodes.INode{},
 	}
 }
@@ -56,7 +56,7 @@ func (template *Template) Compile(content string) error {
 	go GetNodes(content, c, &wg, template.Config)
 	for node := range c {
 		if node.Type() == nodes.NODE_TYPE_IF {
-			ifElseNode := nodes.NewIfElseNode()
+			ifElseNode := nodes.NewIfElseNode(node.GetContent())
 			ifElseNode.IfNode = node
 			template.addNode(&ifElseNode)
 			template.addNode(node)

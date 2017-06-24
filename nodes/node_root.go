@@ -4,8 +4,8 @@ type RootNode struct {
 	HasChildren
 }
 
-func NewRootNode() RootNode {
-	return RootNode{NewHasChildren("ROOT")}
+func NewRootNode(content string) RootNode {
+	return RootNode{NewHasChildren("ROOT", content)}
 }
 
 func (node *RootNode) ToString() string {

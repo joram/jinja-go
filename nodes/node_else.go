@@ -6,8 +6,8 @@ type ElseNode struct {
 	HasChildren
 }
 
-func NewElseNode() INode {
-	return &ElseNode{NewHasChildren("ELSE")}
+func NewElseNode(content string) INode {
+	return &ElseNode{NewHasChildren("ELSE", content)}
 }
 
 func (node ElseNode) ToString() string {

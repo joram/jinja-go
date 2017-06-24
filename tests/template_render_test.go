@@ -26,6 +26,9 @@ func TemplateRenderTest(path string, f os.FileInfo, err error) error {
 	if !strings.HasSuffix(path, ".html") {
 		return nil
 	}
+	if strings.HasPrefix(path, "templates/sendwithus/") {
+		return nil
+	}
 
 	template := jinja_go.NewTemplate()
 	template.Compile(readFileContent(path))

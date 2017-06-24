@@ -6,8 +6,8 @@ type EndForNode struct {
 	HasNoChildren
 }
 
-func NewEndForNode() INode {
-	return &EndForNode{NewHasNoChildren("ENDFOR")}
+func NewEndForNode(content string) INode {
+	return &EndForNode{NewHasNoChildren("ENDFOR", content)}
 }
 
 func (node EndForNode) ToString() string {

@@ -6,8 +6,8 @@ type ForNode struct {
 	HasChildren
 }
 
-func NewForNode() INode {
-	return &ForNode{NewHasChildren("FOR")}
+func NewForNode(content string) INode {
+	return &ForNode{NewHasChildren("FOR", content)}
 }
 
 func (node *ForNode) ToString() string {

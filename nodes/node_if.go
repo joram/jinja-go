@@ -1,13 +1,16 @@
 package nodes
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type IfNode struct {
 	HasChildren
+	Content string
 }
 
-func NewIfNode() INode {
-	return &IfNode{NewHasChildren("IF")}
+func NewIfNode(content string) INode {
+	return &IfNode{NewHasChildren("IF", content), content}
 }
 
 func (node *IfNode) ToString() string {
@@ -19,5 +22,9 @@ func (node *IfNode) Type() int {
 }
 
 func (node *IfNode) Render(context map[string]interface{}) string {
-	return "" // TODO
+	rendered := ""
+	for _, child := range node.Children {
+		rendered += (*child).Render(context)
+	}
+	return rendered
 }

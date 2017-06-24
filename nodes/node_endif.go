@@ -6,8 +6,8 @@ type EndIfNode struct {
 	HasNoChildren
 }
 
-func NewEndIfNode() INode {
-	return &EndIfNode{NewHasNoChildren("ENDIF")}
+func NewEndIfNode(content string) INode {
+	return &EndIfNode{NewHasNoChildren("ENDIF", content)}
 }
 
 func (node EndIfNode) ToString() string {

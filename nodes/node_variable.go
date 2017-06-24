@@ -8,7 +8,7 @@ type VariableNode struct {
 }
 
 func NewVariableNode(body string) INode {
-	return &VariableNode{NewHasNoChildren("VAR"), body}
+	return &VariableNode{NewHasNoChildren("VAR", body), body}
 }
 func (node *VariableNode) ToString() string {
 	return fmt.Sprintf("<VAR>")

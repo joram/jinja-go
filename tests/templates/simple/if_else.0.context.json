@@ -1,4 +1,4 @@
 {
-  "foo": "foo",
-  "bar": "bar"
+  "foo": "foo-val",
+  "bar": "bar-val"
 }
