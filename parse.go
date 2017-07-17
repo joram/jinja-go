@@ -1,13 +1,20 @@
 package jinja_go
 
 import (
-	"github.com/joram/jinja-go/nodes"
 	"io"
 	"strings"
 	"sync"
 )
 
-func GetNodes(content string, c chan nodes.INode, wg *sync.WaitGroup, config Configuration) {
+var nodeTypes = map[string]int{
+	"if":     NODE_TYPE_IF,
+	"else":   NODE_TYPE_ELSE,
+	"endif":  NODE_TYPE_ENDIF,
+	"for":    NODE_TYPE_FOR,
+	"endfor": NODE_TYPE_ENDFOR,
+}
+
+func GetNodes(content string, c chan *Node, wg *sync.WaitGroup, config Configuration) {
 	defer wg.Done()
 	var err error
 	for err == nil {
@@ -24,18 +31,20 @@ func GetNodes(content string, c chan nodes.INode, wg *sync.WaitGroup, config Con
 	close(c)
 }
 
-func GetNode(body string, config Configuration) (nodes.INode, int64, error) {
+func GetNode(body string, config Configuration) (*Node, int64, error) {
 	followingNodeStart, _ := GetNodeStartingIndex(body, config)
 	if followingNodeStart > 0 {
 		end := followingNodeStart
-		return nodes.NewTextNode(body[:end]), end, nil
+		node := NewNode(NODE_TYPE_TEXT, body[:end])
+		return &node, end, nil
 	}
 
 	end, s := GetNodeEndingIndex(body, config)
 	end += int64(len(s))
 	if end == -1 {
 		if len(body) > 0 {
-			return nodes.NewTextNode(body), int64(len(body)), io.EOF
+			node := NewNode(NODE_TYPE_TEXT, body)
+			return &node, int64(len(body)), io.EOF
 		}
 		return nil, 0, io.EOF
 	}
@@ -47,30 +56,19 @@ func GetNode(body string, config Configuration) (nodes.INode, int64, error) {
 		blockType = blockType[:strings.Index(blockType, " ")]
 		blockString = strings.TrimLeft(blockString, config.BlockStartString)
 		blockString = strings.TrimRight(blockString, config.BlockEndString)
-		if blockType == "if" {
-			return nodes.NewIfNode(blockString), end, nil
-		}
-		if blockType == "else" {
-			return nodes.NewElseNode(blockString), end, nil
-		}
-		if blockType == "endif" {
-			return nodes.NewEndIfNode(blockString), end, nil
-		}
-		if blockType == "for" {
-			return nodes.NewForNode(blockString), end, nil
-		}
-		if blockType == "endfor" {
-			return nodes.NewEndForNode(blockString), end, nil
-		}
-		return nil, end, nil
+
+		node := NewNode(nodeTypes[blockType], blockString)
+		return &node, end, nil
 	}
 
 	if s == config.VariableEndString {
-		return nodes.NewVariableNode(body[:end]), end, nil
+		node := NewNode(NODE_TYPE_VARIABLE, body[:end])
+		return &node, end, nil
 	}
 
 	if s == config.CommentEndString {
-		return nodes.NewCommentNode(body[:end]), end, nil
+		node := NewNode(NODE_TYPE_COMMENT, body[:end])
+		return &node, end, nil
 	}
 
 	return nil, end, nil

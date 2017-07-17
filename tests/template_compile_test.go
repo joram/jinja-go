@@ -3,21 +3,21 @@ package jinja_go_tests
 import (
 	"errors"
 	"fmt"
-	"github.com/joram/jinja-go"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/joram/jinja-go"
 )
 
 func TemplateCompileTest(templatePath string, f os.FileInfo, err error) error {
-	fmt.Printf("checking compiled tree of: %s\n", templatePath)
 	if !strings.HasSuffix(templatePath, ".html") {
 		return nil
 	}
-	if true {
-		return nil
-	}
+	//if true {
+	//	return nil
+	//}
+	fmt.Printf("checking compiled tree of: %s\n", templatePath)
 
 	// arrange
 	expectedTreePath := strings.Replace(templatePath, ".html", ".compile_tree.json", 1)
@@ -43,9 +43,9 @@ func TemplateCompileTest(templatePath string, f os.FileInfo, err error) error {
 }
 
 func Test(t *testing.T) {
-	println("testing compiling")
-	err := filepath.Walk("templates/", TemplateCompileTest)
-	if err != nil {
-		t.Errorf("failed to compile template: ", err)
-	}
+	//println("testing compiling")
+	//err := filepath.Walk("templates/", TemplateCompileTest)
+	//if err != nil {
+	//	t.Errorf("failed to compile template: ", err)
+	//}
 }
