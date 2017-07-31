@@ -3,53 +3,50 @@ package jinja
 import "fmt"
 
 type Token struct {
-	Type  int
+	Type  string
 	Value string
 	line  int
 }
 
-// Token definitions
+// Tokens definitions
 const (
-	ADD = iota
-	ASSIGN
-	COLON
-	COMMA
-	DIV
-	DOT
-	EQ
-	FLOORDIV
-	GT
-	GTEQ
-	LBRACE
-	LBRACKET
-	LPAREN
-	LT
-	LTEQ
-	MOD
-	MUL
-	NE
-	PIPE
-	POW
-	RBRACE
-	RBRACKET
-	RPAREN
-	SEMICOLON
-	SUB
-	TILDE
-	WHITESPACE
-	FLOAT
-	INTEGER
-	NAME
-	STRING
-	OPERATOR
+	ADD              = "+"
+	ASSIGN           = "=="
+	COLON            = ":"
+	COMMA            = ","
+	DIV              = "/"
+	DOT              = "."
+	EQ               = "="
+	FLOORDIV         = "//"
+	GT               = ">"
+	GTEQ             = ">="
+	LBRACE           = "{"
+	LBRACKET         = "["
+	LPAREN           = "("
+	LT               = "<"
+	LTEQ             = "<="
+	MOD              = "%"
+	MUL              = "*"
+	NE               = "!="
+	PIPE             = "|"
+	POW              = "^"
+	RBRACE           = "}"
+	RBRACKET         = "]"
+	RPAREN           = ")"
+	SEMICOLON        = ";"
+	SUB              = "-"
+	FLOAT            = "FLOAT"
+	INTEGER          = "INTEGER"
+	IDENTIFIER       = "IDENTIFIER"
+	EXTERNAL_CONTENT = "EXTERNAL_CONTENT"
+	ILLEGAL          = "ILLEGAL"
 	BLOCK_BEGIN
 	BLOCK_END
-	VARIABLE
 	RAW_BEGIN
 	RAW_END
 	DATA
 	INITIAL
-	EOF
+	EOF = "EOF"
 	NEWLINE
 
 	LINESTATEMENT_BEGIN
@@ -58,94 +55,43 @@ const (
 	LINECOMMENT_END
 	LINECOMMENT
 
-	COMMENT_BEGIN
-	COMMENT_END
-
-	LOGIC_BEGIN
-	LOGIC_END
-
-	OUTPUT_BEGIN
-	OUTPUT_END
-
-	SPACE
-	DOUBLEQUOTE
+	COMMENT_BEGIN    = "{#"
+	COMMENT_END      = "#}"
+	EXPRESSION_BEGIN = "{{"
+	EXPRESSION_END   = "}}"
 )
 
-var operators = map[string]int{
-	"==": EQ,
-	"/+": ADD,
-	"-":  SUB,
-	"/":  DIV,
-	"//": FLOORDIV,
-	"*":  MUL,
-	"%":  MOD,
-	"**": POW,
-	"~":  TILDE,
-	"[":  LBRACKET,
-	"]":  RBRACKET,
-	"(":  LPAREN,
-	")":  RPAREN,
-	//"{":  LBRACE,
-	//"}":  RBRACE,
-	"!=": NE,
-	">":  GT,
-	">=": GTEQ,
-	"<":  LT,
-	"<=": LTEQ,
-	"=":  ASSIGN,
-	".":  DOT,
-	":":  COLON,
-	"|":  PIPE,
-	",":  COMMA,
-	";":  SEMICOLON,
-	" ":  SPACE,
-	"\"": DOUBLEQUOTE,
-
-	"{{": OUTPUT_BEGIN,
-	"}}": OUTPUT_END,
-	"{%": LOGIC_BEGIN,
-	"%}": LOGIC_END,
-	"{#": COMMENT_BEGIN,
-	"#}": COMMENT_END,
-}
-
-var operatorNames = map[int]string{
-	EQ:          "EQ",
-	ADD:         "ADD",
-	SUB:         "SUB",
-	FLOORDIV:    "FLOORDIV",
-	DIV:         "DIV",
-	MUL:         "MUL",
-	MOD:         "MOD",
-	POW:         "POW",
-	TILDE:       "TILDE",
-	LBRACKET:    "LBRACKET",
-	RBRACKET:    "RBRACKET",
-	LPAREN:      "LPAREN",
-	RPAREN:      "RPAREN",
-	NE:          "NE",
-	GT:          "GT",
-	GTEQ:        "GTEQ",
-	LT:          "LT",
-	LTEQ:        "LTEQ",
-	ASSIGN:      "ASSIGN",
-	DOT:         "DOT",
-	COLON:       "COLON",
-	PIPE:        "PIPE",
-	COMMA:       "COMMA",
-	SEMICOLON:   "SEMICOLON",
-	SPACE:       "SPACE",
-	DOUBLEQUOTE: "DOUBLEQUOTE",
-
-	OUTPUT_BEGIN:  "OUTPUT_BEGIN",
-	OUTPUT_END:    "OUTPUT_END",
-	LOGIC_BEGIN:   "LOGIC_BEGIN",
-	LOGIC_END:     "LOGIC_END",
-	COMMENT_BEGIN: "COMMENT_BEGIN",
-	COMMENT_END:   "COMMENT_END",
-	STRING:        "STRING",
-	VARIABLE:      "VARIABLE",
-	EOF:           "EOF",
+var tokenNames = map[string]string{
+	EQ:               "EQ",
+	ADD:              "ADD",
+	SUB:              "SUB",
+	FLOORDIV:         "FLOORDIV",
+	DIV:              "DIV",
+	MUL:              "MUL",
+	MOD:              "MOD",
+	POW:              "POW",
+	LBRACKET:         "LBRACKET",
+	RBRACKET:         "RBRACKET",
+	LPAREN:           "LPAREN",
+	RPAREN:           "RPAREN",
+	NE:               "NE",
+	GT:               "GT",
+	GTEQ:             "GTEQ",
+	LT:               "LT",
+	LTEQ:             "LTEQ",
+	ASSIGN:           "ASSIGN",
+	DOT:              "DOT",
+	COLON:            "COLON",
+	PIPE:             "PIPE",
+	COMMA:            "COMMA",
+	SEMICOLON:        "SEMICOLON",
+	EXPRESSION_BEGIN: "EXPRESSION_BEGIN",
+	EXPRESSION_END:   "EXPRESSION_END",
+	COMMENT_BEGIN:    "COMMENT_BEGIN",
+	COMMENT_END:      "COMMENT_END",
+	EXTERNAL_CONTENT: EXTERNAL_CONTENT,
+	EOF:              EOF,
+	ILLEGAL:          ILLEGAL,
 }
 
 var blockPairs = []struct{ begin, end string }{
@@ -164,6 +110,6 @@ func (token *Token) closesBlock() bool {
 }
 
 func (token *Token) String() string {
-	tokenType := operatorNames[token.Type]
+	tokenType := tokenNames[token.Type]
 	return fmt.Sprintf("<%v '%s'>", tokenType, token.Value)
 }
