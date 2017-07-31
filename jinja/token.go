@@ -2,10 +2,19 @@ package jinja
 
 import "fmt"
 
+type TokenDefinition struct {
+	tokenType   int
+	tokenName   string
+	tokenString string
+	comparator  bool
+	opensBlock  bool
+	closesBlock bool
+	operator    bool
+}
 type Token struct {
-	Type  int
-	Value string
-	line  int
+	Definition TokenDefinition
+	Value      string
+	line       int
 }
 
 // Token definitions
@@ -67,103 +76,86 @@ const (
 	OUTPUT_BEGIN
 	OUTPUT_END
 
+	TEXT
 	SPACE
+	SINGLEQUOTE
 	DOUBLEQUOTE
 )
 
-var operators = map[string]int{
-	"==": EQ,
-	"/+": ADD,
-	"-":  SUB,
-	"/":  DIV,
-	"//": FLOORDIV,
-	"*":  MUL,
-	"%":  MOD,
-	"**": POW,
-	"~":  TILDE,
-	"[":  LBRACKET,
-	"]":  RBRACKET,
-	"(":  LPAREN,
-	")":  RPAREN,
-	//"{":  LBRACE,
-	//"}":  RBRACE,
-	"!=": NE,
-	">":  GT,
-	">=": GTEQ,
-	"<":  LT,
-	"<=": LTEQ,
-	"=":  ASSIGN,
-	".":  DOT,
-	":":  COLON,
-	"|":  PIPE,
-	",":  COMMA,
-	";":  SEMICOLON,
-	" ":  SPACE,
-	"\"": DOUBLEQUOTE,
+var tokenDefinitions = []TokenDefinition{
 
-	"{{": OUTPUT_BEGIN,
-	"}}": OUTPUT_END,
-	"{%": LOGIC_BEGIN,
-	"%}": LOGIC_END,
-	"{#": COMMENT_BEGIN,
-	"#}": COMMENT_END,
+	// Comparators
+	{EQ, "EQ", "==", true, false, false, false},
+	{NE, "NE", "!=", true, false, false, false},
+	{GT, "GT", ">", true, false, false, false},
+	{GTEQ, "GTEQ", ">=", true, false, false, false},
+	{LT, "LT", "<", true, false, false, false},
+	{LTEQ, "LTEQ", "<=", true, false, false, false},
+
+	// Operators
+	{ADD, "ADD", "+", false, false, false, true},
+	{SUB, "SUB", "-", false, false, false, true},
+	{FLOORDIV, "FLOORDIV", "//", false, false, false, true},
+	{DIV, "DIV", "/", false, false, false, true},
+	{MUL, "MUL", "*", false, false, false, true},
+	{MOD, "MOD", "%", false, false, false, true},
+	{POW, "POW", "^", false, false, false, true},
+
+	// blocks
+	{OUTPUT_BEGIN, "OUTPUT_BEGIN", "{{", false, true, false, false},
+	{OUTPUT_END, "OUTPUT_END", "}}", false, false, true, false},
+	{LOGIC_BEGIN, "LOGIC_BEGIN", "%}", false, true, false, false},
+	{LOGIC_END, "LOGIC_END", "{%", false, false, true, false},
+	{COMMENT_BEGIN, "COMMENT_BEGIN", "{#", false, true, false, false},
+	{COMMENT_END, "COMMENT_END", "#}", false, false, true, false},
+
+	{LBRACKET, "LBRACKET", "[", false, false, false, false},
+	{RBRACKET, "RBRACKET", "]", false, false, false, false},
+	{LPAREN, "LPAREN", "(", false, false, false, false},
+	{RPAREN, "RPAREN", ")", false, false, false, false},
+	{ASSIGN, "ASSIGN", "=", false, false, false, false},
+	{DOT, "DOT", ".", false, false, false, false},
+	{COLON, "COLON", ":", false, false, false, false},
+	{PIPE, "PIPE", "|", false, false, false, false},
+	{COMMA, "COMMA", ",", false, false, false, false},
+	{SEMICOLON, "SEMICOLON", ";", false, false, false, false},
+	{SPACE, "SPACE", " ", false, false, false, false},
+	{SINGLEQUOTE, "SINGLEQUOTE", "'", false, false, false, false},
+	{DOUBLEQUOTE, "DOUBLEQUOTE", "\"", false, false, false, false},
+
+	// shouldn't be searched for
+	{STRING, "STRING", "", false, false, false, false},
+	{VARIABLE, "VARIABLE", "", false, false, false, false},
+	{EOF, "EOF", "", false, false, false, false},
+	{TEXT, "TEXT", "", false, false, false, false},
+	{TILDE, "TILDE", "", false, false, false, false},
 }
 
-var operatorNames = map[int]string{
-	EQ:          "EQ",
-	ADD:         "ADD",
-	SUB:         "SUB",
-	FLOORDIV:    "FLOORDIV",
-	DIV:         "DIV",
-	MUL:         "MUL",
-	MOD:         "MOD",
-	POW:         "POW",
-	TILDE:       "TILDE",
-	LBRACKET:    "LBRACKET",
-	RBRACKET:    "RBRACKET",
-	LPAREN:      "LPAREN",
-	RPAREN:      "RPAREN",
-	NE:          "NE",
-	GT:          "GT",
-	GTEQ:        "GTEQ",
-	LT:          "LT",
-	LTEQ:        "LTEQ",
-	ASSIGN:      "ASSIGN",
-	DOT:         "DOT",
-	COLON:       "COLON",
-	PIPE:        "PIPE",
-	COMMA:       "COMMA",
-	SEMICOLON:   "SEMICOLON",
-	SPACE:       "SPACE",
-	DOUBLEQUOTE: "DOUBLEQUOTE",
-
-	OUTPUT_BEGIN:  "OUTPUT_BEGIN",
-	OUTPUT_END:    "OUTPUT_END",
-	LOGIC_BEGIN:   "LOGIC_BEGIN",
-	LOGIC_END:     "LOGIC_END",
-	COMMENT_BEGIN: "COMMENT_BEGIN",
-	COMMENT_END:   "COMMENT_END",
-	STRING:        "STRING",
-	VARIABLE:      "VARIABLE",
-	EOF:           "EOF",
-}
-
-var blockPairs = []struct{ begin, end string }{
-	{"{%", "%}"},
-	{"{#", "#}"},
-	{"{{", "}}"},
-}
-
-func (token *Token) closesBlock() bool {
-	for _, blockPair := range blockPairs {
-		if blockPair.end == token.Value {
-			return true
+func getDefinitionByType(tokenType int) TokenDefinition {
+	for _, def := range tokenDefinitions {
+		if def.tokenType == tokenType {
+			return def
 		}
+	}
+	panic("none found of type " + string(tokenType))
+}
+
+func getDefinitionByString(tokenString string) TokenDefinition {
+	for _, def := range tokenDefinitions {
+		if def.tokenString == tokenString {
+			return def
+		}
+	}
+	panic("none found")
+}
+
+func (token Token) isStatement() bool {
+	if token.Definition.tokenType == STRING {
+		return true
 	}
 	return false
 }
 
-func (token *Token) String() string {
-	tokenType := operatorNames[token.Type]
-	return fmt.Sprintf("<%v '%s'>", tokenType, token.Value)
+func (token Token) String() string {
+	return fmt.Sprintf("<%v '%s'>", token.Definition.tokenName, token.Value)
 }
