@@ -3,6 +3,7 @@ package jinja
 import (
 	"regexp"
 	"sort"
+	"strings"
 )
 
 type Tokenizer struct {
@@ -38,6 +39,11 @@ func NewTokenizer(s string) Tokenizer {
 		currLine:          1,
 		inBlock:           false,
 		C:                 make(chan Token),
+	}
+	if len(s) > 0 {
+		if s[0] == '{' {
+			tokenizer.inBlock = true
+		}
 	}
 	go tokenizer.run()
 	return tokenizer
@@ -77,11 +83,30 @@ func (t *Tokenizer) readIdentifier() Token {
 		t.readChar()
 	}
 	end := t.currPosition - 1
-	return Token{IDENTIFIER, t.body[position:end], t.currLine}
+	tokenType := TokenType(IDENTIFIER)
+	val := t.body[position:end]
+	if _, ok := keywords[val]; ok {
+		tokenType = TokenType(val)
+	}
+	return Token{tokenType, val, t.currLine}
+}
+
+func (t *Tokenizer) readNumber() Token {
+	position := t.currPosition - 1
+	for isNumber(t.ch) || t.ch == '.' {
+		t.readChar()
+	}
+	end := t.currPosition - 1
+	val := t.body[position:end]
+	tokenType := TokenType(INTEGER)
+	if strings.Contains(val, ".") {
+		tokenType = FLOAT
+	}
+	return Token{tokenType, val, t.currLine}
 }
 
 func (t *Tokenizer) next() Token {
-	if t.currPosition == len(t.body) {
+	if t.currPosition >= len(t.body) {
 		return Token{Type: EOF}
 	}
 
@@ -98,10 +123,67 @@ func (t *Tokenizer) next() Token {
 	switch t.ch {
 	case '+':
 		token = Token{ADD, ADD, t.currLine}
+	case '%':
+		token = Token{MOD, MOD, t.currLine}
+	case '/':
+		if t.peek() == '/' {
+			t.readChar()
+			token = Token{FLOORDIV, FLOORDIV, t.currLine}
+		} else {
+			token = Token{DIV, DIV, t.currLine}
+		}
+	case '-':
+		token = Token{SUB, SUB, t.currLine}
+	case '*':
+		token = Token{MUL, MUL, t.currLine}
+	case '^':
+		token = Token{POW, POW, t.currLine}
+	case '|':
+		token = Token{PIPE, PIPE, t.currLine}
+	case '=':
+		if t.peek() == '=' {
+			t.readChar()
+			token = Token{ASSIGN, ASSIGN, t.currLine}
+		} else {
+			token = Token{EQ, EQ, t.currLine}
+		}
+	case '>':
+		if t.peek() == '=' {
+			t.readChar()
+			token = Token{GTEQ, GTEQ, t.currLine}
+		} else {
+			token = Token{GT, GT, t.currLine}
+		}
+	case '<':
+		if t.peek() == '=' {
+			t.readChar()
+			token = Token{LTEQ, LTEQ, t.currLine}
+		} else {
+			token = Token{LT, LT, t.currLine}
+		}
+	case ':':
+		token = Token{COLON, COLON, t.currLine}
+	case ';':
+		token = Token{SEMICOLON, SEMICOLON, t.currLine}
+	case '.':
+		token = Token{DOT, DOT, t.currLine}
+	case ',':
+		token = Token{COMMA, COMMA, t.currLine}
+	case '[':
+		token = Token{LBRACKET, LBRACKET, t.currLine}
+	case ']':
+		token = Token{RBRACKET, RBRACKET, t.currLine}
+	case '(':
+		token = Token{LPAREN, LPAREN, t.currLine}
+	case ')':
+		token = Token{RPAREN, RPAREN, t.currLine}
 	case '{':
 		if t.peek() == '{' {
 			t.readChar()
 			token = Token{EXPRESSION_BEGIN, EXPRESSION_BEGIN, t.currLine}
+		} else if t.peek() == '#' {
+			t.readChar()
+			token = Token{COMMENT_BEGIN, COMMENT_BEGIN, t.currLine}
 		} else {
 			token = Token{LBRACE, LBRACE, t.currLine}
 		}
@@ -113,30 +195,29 @@ func (t *Tokenizer) next() Token {
 		} else {
 			token = Token{RBRACE, RBRACE, t.currLine}
 		}
+	case '#':
+		if t.peek() == '}' {
+			t.readChar()
+			token = Token{COMMENT_END, COMMENT_END, t.currLine}
+			t.inBlock = false
+		}
+	case '!':
+		if t.peek() == '=' {
+			t.readChar()
+			token = Token{NE, NE, t.currLine}
+		} else {
+			token = t.readIdentifier()
+		}
 	default:
-		token = t.readIdentifier()
+		if isNumber(t.peek()) {
+			token = t.readNumber()
+		} else {
+			token = t.readIdentifier()
+		}
 	}
 
 	t.readChar()
 	return token
-	//for operator, tokenType := range operators {
-	//	if strings.HasPrefix(t.body[t.currPosition:], operator) {
-	//		token := Token{
-	//			tokenType,
-	//			t.body[t.currPosition : t.currPosition+len(operator)],
-	//			t.currLine,
-	//		}
-	//		if token.closesBlock() {
-	//			t.inBlock = false
-	//		}
-	//		t.currPosition += len(operator)
-	//		return token
-	//	}
-	//}
-	//
-	//token := t.readIdentifier()
-	//t.currPosition += len(token.Value)
-	//return token
 }
 
 func (t *Tokenizer) peek() byte {
@@ -163,4 +244,8 @@ func (t *Tokenizer) readChar() {
 
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+}
+
+func isNumber(ch byte) bool {
+	return '0' <= ch && ch <= '9'
 }
