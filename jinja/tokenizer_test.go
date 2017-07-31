@@ -38,3 +38,11 @@ func Test(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkTokenizerSimple(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		tokenizer := NewTokenizer("before {{ foo }} middle {{ bar }} after")
+		for range tokenizer.C {
+		}
+	}
+}
