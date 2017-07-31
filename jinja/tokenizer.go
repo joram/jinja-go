@@ -83,7 +83,12 @@ func (t *Tokenizer) readIdentifier() Token {
 		t.readChar()
 	}
 	end := t.currPosition - 1
-	return Token{IDENTIFIER, t.body[position:end], t.currLine}
+	tokenType := TokenType(IDENTIFIER)
+	val := t.body[position:end]
+	if _, ok := keywords[val]; ok {
+		tokenType = TokenType(val)
+	}
+	return Token{tokenType, val, t.currLine}
 }
 
 func (t *Tokenizer) readNumber() Token {
@@ -93,7 +98,7 @@ func (t *Tokenizer) readNumber() Token {
 	}
 	end := t.currPosition - 1
 	val := t.body[position:end]
-	tokenType := INTEGER
+	tokenType := TokenType(INTEGER)
 	if strings.Contains(val, ".") {
 		tokenType = FLOAT
 	}

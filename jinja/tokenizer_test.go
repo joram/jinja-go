@@ -65,6 +65,15 @@ func Test(t *testing.T) {
 			{EXPRESSION_END, "}}", 1},
 			{Type: EOF},
 		}},
+		{"{{ not if elif True }}", []Token{
+			{EXPRESSION_BEGIN, "{{", 1},
+			{NOT, NOT, 1},
+			{IF, IF, 1},
+			{ELIF, ELIF, 1},
+			{TRUE, TRUE, 1},
+			{EXPRESSION_END, "}}", 1},
+			{Type: EOF},
+		}},
 	}
 
 	for _, item := range items {

@@ -3,10 +3,12 @@ package jinja
 import "fmt"
 
 type Token struct {
-	Type  string
+	Type  TokenType
 	Value string
 	line  int
 }
+
+type TokenType string
 
 // Tokens definitions
 const (
@@ -40,28 +42,51 @@ const (
 	IDENTIFIER       = "IDENTIFIER"
 	EXTERNAL_CONTENT = "EXTERNAL_CONTENT"
 	ILLEGAL          = "ILLEGAL"
-	BLOCK_BEGIN
-	BLOCK_END
-	RAW_BEGIN
-	RAW_END
-	DATA
-	INITIAL
-	EOF = "EOF"
-	NEWLINE
-
-	LINESTATEMENT_BEGIN
-	LINESTATEMENT_END
-	LINECOMMENT_BEGIN
-	LINECOMMENT_END
-	LINECOMMENT
-
+	EOF              = "EOF"
 	COMMENT_BEGIN    = "{#"
 	COMMENT_END      = "#}"
 	EXPRESSION_BEGIN = "{{"
 	EXPRESSION_END   = "}}"
+
+	// Keywords
+	NOT      = "not"
+	IF       = "if"
+	AND      = "and"
+	OR       = "or"
+	ELIF     = "elif"
+	ELSE     = "else"
+	IN       = "in"
+	DEL      = "del"
+	TRUE     = "True"
+	FALSE    = "False"
+	YIELD    = "yield"
+	IS       = "is"
+	LAMBDA   = "lambda"
+	FOR      = "for"
+	CONTINUE = "continue"
+	NONE     = "none"
 )
 
-var tokenNames = map[string]string{
+var keywords = map[string]TokenType{
+	"not":      NOT,
+	"if":       IF,
+	"and":      AND,
+	"or":       OR,
+	"elif":     ELIF,
+	"in":       IN,
+	"del":      DEL,
+	"True":     TRUE,
+	"False":    FALSE,
+	"yield":    YIELD,
+	"is":       IS,
+	"lambda":   LAMBDA,
+	"for":      FOR,
+	"none":     NONE,
+	"else":     ELSE,
+	"continue": CONTINUE,
+}
+
+var tokenNames = map[TokenType]string{
 	EQ:               "EQ",
 	ADD:              "ADD",
 	SUB:              "SUB",
@@ -92,6 +117,22 @@ var tokenNames = map[string]string{
 	EXTERNAL_CONTENT: EXTERNAL_CONTENT,
 	EOF:              EOF,
 	ILLEGAL:          ILLEGAL,
+	NOT:              "not",
+	IF:               "if",
+	AND:              "and",
+	OR:               "or",
+	ELIF:             "elif",
+	ELSE:             "else",
+	IN:               "in",
+	DEL:              "del",
+	TRUE:             "True",
+	FALSE:            "False",
+	YIELD:            "yield",
+	IS:               "is",
+	LAMBDA:           "lambda",
+	FOR:              "for",
+	CONTINUE:         "continue",
+	NONE:             "none",
 }
 
 var blockPairs = []struct{ begin, end string }{
